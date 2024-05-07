@@ -11,6 +11,7 @@ import routes from './routes'
  * with the Router instance.
  */
 
+
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
@@ -24,6 +25,12 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE)
+  })
+  Router.beforeEach((to,from,next)=>{//beforeEach是router的钩子函数，在进入路由前执行
+    if(to.meta.title){
+      document.title = to.meta.title
+    }
+    next()  //执行进入路由，如果不写就不会进入目标页
   })
 
   return Router

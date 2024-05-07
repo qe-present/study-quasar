@@ -12,10 +12,13 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Study-Quasar
         </q-toolbar-title>
+        <q-btn @click="$q.dark.toggle()" >
+          暗黑模式切换按钮
+        </q-btn>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>Quasar 版本：v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
@@ -23,20 +26,21 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
+      :mini="mini"
+      @mouseout="mini = true"
+      @mouseover="mini = false"
+
     >
       <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
+        <q-toolbar class="bg-primary text-white shadow-2">
+          <q-toolbar-title>组件库</q-toolbar-title>
+        </q-toolbar>
       </q-list>
+      <EssentialLink
+        v-for="link in linksList"
+        :key="link.title"
+        v-bind="link"
+         />
     </q-drawer>
 
     <q-page-container>
@@ -47,57 +51,40 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
 
-defineOptions({
-  name: 'MainLayout'
-})
-
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+let mini = ref(true)
+const linksList = []
+const router = useRouter()
+let allRoutes = router.options.routes
+allRoutes.forEach(route => {
+  if (route.children) {
+    route.children.forEach(child => {
+      if (child.meta) {
+        linksList.push(
+          {
+            title: child.meta.title || child.name,
+            icon: child.meta.icon,
+            link: child.name
+          }
+        )
+      }
+      else{
+        linksList.push(
+          {
+            title: child.name,
+            icon: 'folder',
+            link: child.name
+          }
+        )
+      }
+    })
   }
-]
-
+})
+defineOptions({
+  name: 'index',
+})
 const leftDrawerOpen = ref(false)
 
 function toggleLeftDrawer () {
